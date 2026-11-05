@@ -33,6 +33,7 @@
   button, input, select, textarea { font: inherit; color: inherit; border-radius: 0; }
   a { color: inherit; text-decoration: none; }
   img { display: block; width: 100%; height: 100%; object-fit: cover; user-select: none; -webkit-user-drag: none; }
+  img[data-foto]:not([src]) { visibility: hidden; }
   :focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
   .band { padding-left: max(var(--gut), env(safe-area-inset-left, 0px)); padding-right: max(var(--gut), env(safe-area-inset-right, 0px)); }
   .tall { font-family: var(--tall); font-weight: 400; line-height: .9; letter-spacing: .012em; text-transform: uppercase; }
@@ -1362,7 +1363,17 @@
     function renderPDP() {
       var p = byId(S.pid), root = document.documentElement.style, i = P.indexOf(p), nx = byYear[(byYear.indexOf(p) + 1) % byYear.length];
       root.setProperty('--pbg', p.bg); root.setProperty('--pon', p.on);
-      var im = $('#p-img'); im.src = ph(p); im.alt = 'Imagem ilustrativa de um frasco genérico para o perfume ' + p.name;
+      var im = $('#p-img'), imageVersion = (im._imageVersion || 0) + 1;
+      im._imageVersion = imageVersion;
+      im.style.visibility = 'hidden';
+      im.alt = 'Imagem ilustrativa de um frasco genérico para o perfume ' + p.name;
+      im.onload = function () {
+        var decoded = im.decode ? im.decode() : Promise.resolve();
+        decoded.then(function () {
+          if (im._imageVersion === imageVersion) im.style.visibility = '';
+        }).catch(function () {});
+      };
+      im.src = ph(p);
       $('#p-brand').textContent = p.brand;
       $('#p-name').textContent = p.name; $('#p-name').setAttribute('aria-label', p.name);
       $('#p-tag').textContent = p.tag;
