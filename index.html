@@ -212,6 +212,7 @@
   .mk--still .mk__c, .mk--still .mk__n { position: static; opacity: 1; width: auto; text-align: left; max-width: 60ch; }
   .mk--still .mk__c h3 { font-size: 72px; }
   @media (max-width: 860px) {
+    .hero .smk { display: none; }
     .mk__c { width: auto; right: var(--gut); bottom: 2.5vh; }
     .mk__c h3 { font-size: clamp(64px, 20vw, 110px); }
     .mk__c p.h { margin-top: 12px; font-size: 19px; }
@@ -422,10 +423,10 @@
     .hero__s { top: 92px; }
     .smk { -webkit-mask-image: linear-gradient(90deg, #000 0 28%, transparent 46%), linear-gradient(0deg, transparent 30%, #000 48%); mask-image: linear-gradient(90deg, #000 0 28%, transparent 46%), linear-gradient(0deg, transparent 30%, #000 48%); }
     .mani, .map, .pdp, .co, .sto, .ft__g { grid-template-columns: minmax(0, 1fr); }
-    .gal { height: auto; min-height: 0; overflow-x: auto; scroll-snap-type: x mandatory; }
-    .gal__t { height: auto; }
+    .gal { height: 100svh; min-height: 0; overflow: hidden; }
+    .gal__t { height: 100%; }
     .pan { width: 86vw; grid-template-columns: minmax(0, 1fr); padding: 76px 10px 22px; scroll-snap-align: center; align-items: start; }
-    .pan__im { height: auto; aspect-ratio: 4 / 5; }
+    .pan__im { height: min(58svh, 107.5vw); aspect-ratio: 4 / 5; }
     .pan__im img { width: 100%; margin-left: 0; }
     .pan__n { position: absolute; left: 18px; top: 84px; margin: 0; font-size: 84px; mix-blend-mode: normal; color: #fff; }
     .mk__n { top: 78px; bottom: auto; }
@@ -447,7 +448,7 @@
     .col--list .itm__t { grid-template-columns: minmax(0, 1fr) auto; padding-top: 14px; }
     .col--list .itm__n { grid-column: 1 / -1; margin-bottom: 8px; font-size: min(21vw, 150px); line-height: 1.02; }
     .col--list .itm__a { grid-column: 1 / -1; justify-self: start; margin-block: 8px 14px; }
-    .ft { padding-bottom: 76px; }
+    .ft { padding-bottom: 0; }
     .res__o { grid-template-columns: minmax(0, 1fr); }
     .evo__h { align-items: flex-start; }
   }
@@ -504,6 +505,8 @@
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
+    .gal { height: auto; min-height: 0; overflow-x: auto; scroll-snap-type: x mandatory; }
+    .gal__t { height: auto; }
   }
 </style>
 </head>
@@ -1561,12 +1564,20 @@
     function buildHome(first) {
       if (!heroSplit) { heroSplit = true; $$('.hw').forEach(letters); wordsOf($('#mani')); }
       var chs = $$('#hero-h .ch');
+      if (window.innerWidth <= 860) {
+        G.set('#hero-h .ch-m', { overflow: 'visible' });
+        var entrance = G.fromTo('#hero-h', { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: .65, ease: 'power3.out', clearProps: 'transform,opacity' });
+        var finishEntrance = function () { if (window.scrollY > 8) entrance.progress(1); };
+        window.addEventListener('scroll', finishEntrance, { passive: true });
+        offs.push(function () { window.removeEventListener('scroll', finishEntrance); });
+      } else {
       G.set('#hero-h .ch-m', { overflow: 'hidden' }); G.from(chs, { yPercent: 112, duration: 1.5, ease: 'expo.out', stagger: .045, delay: first ? .25 : .05, onComplete: function () { G.set('#hero-h .ch-m', { overflow: 'visible' }); } });
       G.from('.hero__s > *', { opacity: 0, y: 14, duration: 1.1, delay: .9, stagger: .08, ease: 'power3.out' });
       
       /* As letras sobem e saem ao rolar; a foto fica parada. A rolagem mexe só nas máscaras, para não disputar com a entrada das letras */
       var ht = G.timeline({ scrollTrigger: { trigger: '#hero', start: 'top top', end: '+=70%', pin: true, scrub: .7 } });
       ht.fromTo('#hero-h .ch-m', { yPercent: 0, opacity: 1 }, { yPercent: function (i) { return -60 - (i * 53 % 90); }, opacity: 0, ease: 'none', stagger: { each: .03, from: 'center' } }, 0).fromTo('.hero__s', { opacity: 1 }, { opacity: 0, ease: 'none', duration: .3 }, 0);
+      }
       /* Manifesto acende palavra por palavra */
       G.fromTo('#mani .w', { opacity: .4 }, { opacity: 1, stagger: .1, ease: 'none', scrollTrigger: { trigger: '#mani', start: 'top 85%', end: 'bottom 75%', scrub: .5 } });
       buildMaking($('#mk1'));
@@ -1582,13 +1593,17 @@
       G.from('.out .ser', { y: 50, opacity: 0, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '.out', start: 'top 80%' } });
 
       mm = G.matchMedia();
-      mm.add('(min-width: 861px)', function () {
+      mm.add('(min-width: 0px)', function () {
         /* Galeria horizontal presa à rolagem, com fundo mudando a cada perfume */
         var tr = $('#gal-t'), dist = function () { return tr.scrollWidth - window.innerWidth; }, gal = $('#gal'), last = -1;
         var tw = G.to(tr, { x: function () { return -dist(); }, ease: 'none', scrollTrigger: { trigger: gal, start: 'top top', end: function () { return '+=' + dist(); }, pin: true, scrub: 1, invalidateOnRefresh: true,
           onUpdate: function (s) { var i = Math.min(FEAT.length - 1, Math.floor(s.progress * FEAT.length)); if (i !== last) { last = i; G.to(gal, { '--gbg': FEAT[i].bg, '--gfg': FEAT[i].on, duration: .9, ease: 'power2.out', overwrite: 'auto' }); } } } });
-        $$('.pan__im img').forEach(function (im) { G.fromTo(im, { xPercent: -9 }, { xPercent: 9, ease: 'none', scrollTrigger: { trigger: im.closest('.pan'), containerAnimation: tw, start: 'left right', end: 'right left', scrub: true } }); });
-        $$('.pan__n').forEach(function (n) { G.fromTo(n, { x: 120 }, { x: -60, ease: 'none', scrollTrigger: { trigger: n.closest('.pan'), containerAnimation: tw, start: 'left right', end: 'right left', scrub: true } }); });
+        if (window.innerWidth > 860) {
+          $$('.pan__im img').forEach(function (im) { G.fromTo(im, { xPercent: -9 }, { xPercent: 9, ease: 'none', scrollTrigger: { trigger: im.closest('.pan'), containerAnimation: tw, start: 'left right', end: 'right left', scrub: true } }); });
+          $$('.pan__n').forEach(function (n) { G.fromTo(n, { x: 120 }, { x: -60, ease: 'none', scrollTrigger: { trigger: n.closest('.pan'), containerAnimation: tw, start: 'left right', end: 'right left', scrub: true } }); });
+        }
+      });
+      mm.add('(min-width: 861px)', function () {
         /* Século: ano conta sozinho enquanto os frascos se empilham */
         var sts = $$('#tl-s a'), tlS = $('#tempo'), li = -1, tl = G.timeline({ scrollTrigger: { trigger: tlS, start: 'top top', end: '+=' + (byYear.length * 34) + '%', pin: true, scrub: .6,
           onUpdate: function (s) { var i = Math.min(byYear.length - 1, Math.floor(s.progress * byYear.length)); if (i !== li) { li = i; tlInfo(i); G.fromTo('#tl-i > *', { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: .5, stagger: .05, overwrite: true }); G.to(tlS, { '--tbg': byYear[i].bg, '--tfg': byYear[i].on, duration: .8, overwrite: 'auto' }); } } } });
