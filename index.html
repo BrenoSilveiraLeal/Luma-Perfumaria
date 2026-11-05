@@ -275,7 +275,8 @@
   .evo canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
   .evo__h { position: relative; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px 40px; margin-bottom: 16px; }
   .evo__h .ser { font-size: clamp(32px, 4.4vw, 68px); max-width: 22ch; }
-  .evo__c { display: flex; align-items: center; gap: 18px; }
+  .evo__c { display: grid; grid-template-columns: auto auto; align-items: center; gap: 18px; }
+  .evo__c .rd { min-width: 0; width: 4.5ch; white-space: nowrap; }
   .hold { position: relative; flex: none; width: min(216px, 62vw); height: 54px; padding: 0; overflow: hidden; border: 1px solid var(--pon); border-radius: 99px; background: none; color: var(--pon); font-size: 14px; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; transition: transform .35s cubic-bezier(.2, 1.3, .3, 1); }
   .hold.is-on { transform: scale(.97); }
   .hold span { display: flex; align-items: center; justify-content: center; height: 100%; white-space: nowrap; }
@@ -433,7 +434,7 @@
     .mk__n { top: 78px; bottom: auto; }
     #mk2 .mk__n { top: 78px; bottom: auto; }
     .evo__g { height: 52vh; }
-    .pan--end { width: 74vw; align-content: center; }
+    .pan--end { width: 74vw; margin-left: 40px; padding-left: 24px; align-content: center; }
     .pan--end .tall { font-size: 150px; }
     .tl { display: none; }
     .yrs { display: block; padding-block: 40px 60px; }
@@ -452,6 +453,8 @@
     .ft { padding-bottom: 0; }
     .res__o { grid-template-columns: minmax(0, 1fr); }
     .evo__h { align-items: flex-start; }
+    .evo__c { width: 100%; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; }
+    .evo__c .rd { width: 100%; font-size: clamp(48px, 15vw, 64px); }
   }
   @media (max-width: 640px) {
     .col--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1079,7 +1082,8 @@
       tl.to(bar, { scaleX: 1, duration: 1 }, 0);
       caps.forEach(function (cp, i) {
         var a = ST0[i][0], b = ST0[i][1];
-        if (i) tl.fromTo(cp, { opacity: 0, y: 44 }, { opacity: 1, y: 0, duration: .03, ease: 'power3.out' }, a + .005);
+        var finalMobile = i === caps.length - 1 && window.innerWidth <= 860;
+        if (i) tl.fromTo(cp, { opacity: 0, y: 44 }, { opacity: 1, y: finalMobile ? -40 : 0, duration: .03, ease: 'power3.out' }, a + .005);
         if (i < caps.length - 1) tl.to(cp, { opacity: 0, y: -36, duration: .022 }, b - .022);
       });
       mats.forEach(function (m, i) {
