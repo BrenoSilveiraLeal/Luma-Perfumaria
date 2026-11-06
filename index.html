@@ -99,7 +99,20 @@
   /* Abertura: parede de pedra com um nicho iluminado para cada perfume. A luz de cada nicho tem a cor do frasco */
   .hero { --fg: var(--bone); --mute: rgba(232, 226, 214, .68); --line: rgba(232, 226, 214, .2); --nw: min(max(12.3vw, 150px), 30vh); --nh: calc(var(--nw) * 2.48); position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden; background: #060608; color: var(--bone); }
   .sh { position: absolute; inset: 0; overflow: hidden; scrollbar-width: none; }
+  .hero-scroll { display: contents; }
+  .hero__hint { display: none; }
+  @media (max-width: 860px) {
+    .hero__hint { display: block; margin-top: 8px; font-size: 12px; color: var(--mute); }
+    .hero-scroll.is-horizontal { display: block; height: calc(100svh + var(--hero-travel, 0px)); }
+    .hero-scroll.is-horizontal .hero { position: sticky; top: 0; }
+    .hero-scroll.is-horizontal .sh { scroll-snap-type: none; }
+    .hero.is-close { touch-action: none; }
+  }
   .sh::-webkit-scrollbar { display: none; }
+  /* O close ocupa um espaço livre: os nichos vizinhos não acompanham a câmera. */
+  .sh { opacity: 1; transition: opacity .25s; }
+  .hero.is-close .sh { opacity: 0; transition: opacity .25s .35s; }
+  .hero.is-close .sh__t { clip-path: inset(0 var(--niche-right, 0%) 0 var(--niche-left, 0%)); }
   .sh__i:focus-visible { outline: 0; }
   /* Uma única imagem da parede. A luz é uma cópia mais brilhante dela, revelada só em volta do nicho escolhido */
   @property --cx { syntax: '<percentage>'; inherits: true; initial-value: 50%; }
@@ -420,7 +433,9 @@
   @media (max-width: 700px) {
     .ft .ft__g { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px 24px; padding-block: 8px 32px; }
     .ft__identity { grid-column: 1 / -1; padding-bottom: 24px; border-bottom: 1px solid var(--line); }
-    .ft__intro { max-width: 22ch; margin-top: 16px; }
+    .ft__identity { text-align: center; }
+    .ft__identity .ft__brand { margin-inline: auto; text-indent: .44em; }
+    .ft__intro { max-width: 22ch; margin: 16px auto 0; }
     .ft .ft__links a, .ft__hours { font-size: 14px; }
     .ft__l { margin-bottom: 12px; }
   }
@@ -606,6 +621,15 @@
   .tl__y { font-size: min(34vh, 20vw); color: color-mix(in srgb, var(--tfg, #ece7dd) 42%, transparent); line-height: .95; }
   .tl__s a { background: #0b0b0e; }
   .yrs b { font: 300 30px/1 var(--tall); }
+  @media (max-width: 860px) {
+    .timeline-motion .tl { display: block; }
+    .timeline-motion .yrs { display: none; }
+    .tl__y { top: 10svh; bottom: auto; left: 0; width: 100%; text-align: center; font-size: min(20vw, 15svh); }
+    .tl__s { top: 23svh; left: 50%; width: min(72vw, 43svh); height: 51svh; margin-left: 0; transform: translateX(-50%); }
+    .tl__i { left: var(--gut); right: var(--gut); bottom: 4svh; width: auto; text-align: center; }
+    .tl__i .ser { font-size: clamp(24px, 7vw, 34px); }
+    .tl__k, .tl__p { top: 8svh; }
+  }
   .out .ser { font-size: clamp(36px, 5.4vw, 80px); }
 
   /* Coleção */
@@ -699,15 +723,18 @@
 
 <main>
   <div class="view" id="v-inicio">
+    <div class="hero-scroll" id="hero-scroll">
     <section class="hero" id="hero" aria-labelledby="hero-h">
       <nav class="sh" id="sh" aria-label="Cinco perfumes em destaque"><div class="sh__t" id="sh-t"></div></nav>
       <img class="clo-im" id="clo-im" alt=""><img class="clo-im" id="clo-im2" alt="">
       <article class="clo" id="clo" aria-live="polite"></article>
       <div class="hero__b band">
         <div><p class="hero__s" id="hero-s">Luma Perfumaria · Coleção da casa</p><h1 id="hero-h" aria-label="Cinco rastros"><span class="hw">Cinco</span><span class="hw hw--a">rastros</span></h1><p class="hero__l">Cinco perfumes criados pela Luma. <a class="ln" href="#colecao">Ver os clássicos</a></p></div>
-        <div class="sh__c" id="sh-c"></div>
+        <div><div class="sh__c" id="sh-c"></div><p class="hero__hint" id="hero-hint">Arraste para o lado para explorar os perfumes</p></div>
       </div>
     </section>
+
+    </div>
 
     <section class="mani band" aria-label="Sobre a seleção">
       <div class="mani__text"><p class="ser" id="mani">Você sai da sala e o perfume fica. Os perfumistas chamam esse rastro de <em class="it">sillage</em>.</p><p class="mani__selection">Reunimos doze dos mais marcantes de um século.</p></div>
@@ -1026,6 +1053,7 @@
 
     var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches, fine = window.matchMedia('(pointer: fine)').matches;
     var G = !reduce && window.gsap && window.ScrollTrigger ? window.gsap : null, ST = window.ScrollTrigger;
+    document.documentElement.classList.toggle('timeline-motion', !!G);
     if (G) { G.registerPlugin(ST); if (window.Flip) G.registerPlugin(window.Flip); }
     var $ = function (s) { return document.querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
     function brl(v, c) { return v.toLocaleString('pt-BR', { minimumFractionDigits: c ? 2 : 0, maximumFractionDigits: c ? 2 : 0 }); }
@@ -1447,6 +1475,8 @@
     }
     function shAbrir(i) {
       var primeira = closeI < 0; closeI = i;
+      shT.style.setProperty('--niche-left', (NICHOS[i][0] / PW * 100) + '%');
+      shT.style.setProperty('--niche-right', ((PW - NICHOS[i][1]) / PW * 100) + '%');
       shSet(i); shDetalhe(i); shCam(i); shFoto(i);
       if (primeira) { hero.classList.add('is-close'); sh.inert = true; lock(true); offs.push(function () { shFechar(true); }); }
       var volta = clo.querySelector('[data-clo-back]'); if (volta) volta.focus({ preventScroll: true });
@@ -1480,6 +1510,42 @@
       $$('.sh__i', sh).forEach(function (a) { shObs.observe(a); });
     }
     shSet(-1);
+    /* A rolagem vertical percorre a parede antes de liberar a próxima seção. */
+    var heroScroll = $('#hero-scroll'), heroHint = $('#hero-hint');
+    var heroMobile = window.matchMedia('(max-width: 860px)');
+    var heroReduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var heroTravel = 0, heroFrame = 0, heroSyncLeft = 0;
+    function heroProgress() {
+      heroFrame = 0;
+      if (!heroScroll.classList.contains('is-horizontal') || closeI >= 0 || !heroScroll.getClientRects().length) return;
+      var start = heroScroll.getBoundingClientRect().top + window.scrollY;
+      var left = Math.max(0, Math.min(heroTravel, window.scrollY - start));
+      heroSyncLeft = left;
+      sh.scrollLeft = left;
+      heroHint.textContent = left >= heroTravel - 2 ? 'Continue para baixo para conhecer a coleção' : 'Role para baixo para explorar os perfumes';
+    }
+    function heroQueue() { if (!heroFrame) heroFrame = requestAnimationFrame(heroProgress); }
+    function heroMeasure() {
+      var enabled = heroMobile.matches && !heroReduced.matches;
+      heroScroll.classList.toggle('is-horizontal', enabled);
+      heroTravel = enabled ? Math.max(0, shT.offsetWidth - sh.clientWidth) : 0;
+      heroScroll.style.setProperty('--hero-travel', heroTravel + 'px');
+      if (!enabled) heroHint.textContent = 'Arraste para o lado para explorar os perfumes';
+      heroQueue();
+    }
+    window.addEventListener('scroll', heroQueue, { passive: true });
+    window.addEventListener('resize', heroMeasure);
+    heroMobile.addEventListener('change', heroMeasure);
+    heroReduced.addEventListener('change', heroMeasure);
+    sh.addEventListener('scroll', function () {
+      if (!heroScroll.classList.contains('is-horizontal') || closeI >= 0 || Math.abs(sh.scrollLeft - heroSyncLeft) < 2) return;
+      var start = heroScroll.getBoundingClientRect().top + window.scrollY;
+      if (window.scrollY < start - 1 || window.scrollY > start + heroTravel + 1) return;
+      heroSyncLeft = sh.scrollLeft;
+      if (lenis) lenis.scrollTo(start + heroSyncLeft, { immediate: true, force: true });
+      else window.scrollTo(0, start + heroSyncLeft);
+    }, { passive: true });
+    heroMeasure();
     /* O século só entra na tela com a rolagem: carrega uma tela antes, para a foto não surgir vazia */
     if ('IntersectionObserver' in window) {
       var perto = new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting) return; $$('img', e.target).forEach(function (im) { im.loading = 'eager'; }); perto.unobserve(e.target); }); }, { rootMargin: '100% 0px' });
@@ -1911,7 +1977,7 @@
       G.from('.out .ser', { y: 50, opacity: 0, duration: 1.2, ease: 'expo.out', scrollTrigger: { trigger: '.out', start: 'top 80%' } });
 
       mm = G.matchMedia();
-      mm.add('(min-width: 861px)', function () {
+      mm.add('(min-width: 0px)', function () {
         /* Século: ano conta sozinho enquanto os frascos se empilham */
         var sts = $$('#tl-s a'), tlS = $('#tempo'), li = -1, tl = G.timeline({ scrollTrigger: { trigger: tlS, start: 'top top', end: '+=' + (byYear.length * 45) + '%', pin: true, scrub: 1,
           onUpdate: function (s) { var i = Math.min(byYear.length - 1, Math.floor(s.progress * (byYear.length - 1) + .225)); if (i !== li) { li = i; tlInfo(i); G.fromTo('#tl-i > *', { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: .5, stagger: .05, overwrite: true }); G.to(tlS, { '--tbg': escuro(byYear[i].bg), duration: .8, overwrite: 'auto' }); } } } });
@@ -1955,7 +2021,7 @@
     function parse(r) {
       r = (r || '').replace(/^#/, '') || 'inicio';
       var view = r, anchor = null, pid = null;
-      if (r === 'assinatura' || r === 'tempo') { view = 'inicio'; anchor = r === 'tempo' && window.innerWidth <= 860 ? 'yrs' : r; }
+      if (r === 'assinatura' || r === 'tempo') { view = 'inicio'; anchor = r === 'tempo' && window.innerWidth <= 860 && !G ? 'yrs' : r; }
       if (r.indexOf('perfume-') === 0) { pid = r.slice(8); if (P.indexOf(byId(pid)) >= 0) view = 'perfume'; else { view = 'inicio'; pid = null; } }
       var casa = -1;
       if (r.indexOf('casa-') === 0) { view = 'inicio'; casa = CASA.indexOf(byId(r.slice(5))); }
