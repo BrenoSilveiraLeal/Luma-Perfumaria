@@ -646,7 +646,7 @@
   .col--grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(30px, 3.4vw, 52px) clamp(10px, 1.4vw, 22px); }
   .itm__im { background: #0b0b0e; box-shadow: inset 0 0 0 1px rgba(236, 231, 221, .06); }
   .itm__im img.cut {
-    padding: 22% 15% 14%;
+    padding: 22% 15% 17%;
     background:
       radial-gradient(ellipse at 0% 52%, color-mix(in srgb, var(--c, #cdb086) 48%, transparent), transparent 58%),
       radial-gradient(ellipse at 100% 52%, color-mix(in srgb, var(--c, #cdb086) 48%, transparent), transparent 58%),
@@ -1084,11 +1084,11 @@
     var SZ = { prateleira: '(max-width: 860px) 56vw, 30vw', grande: '(max-width: 860px) 70vw, 50vw', grade: '(max-width: 640px) 50vw, (max-width: 1000px) 33vw, 25vw', mini: '80px' };
     function daCasa(p) { return CASA.indexOf(p) >= 0; }
     /* Linha Luma: foto da parede. Clássicos: frasco recortado, para tudo ficar na mesma luz */
-    function cut(p) { return foto(p.id + (daCasa(p) ? '' : '-nicho')); }
+    function cut(p) { return foto(p.id + (daCasa(p) ? '' : '-frasco')); }
     function escuro(hex) { var c = hexRGB(hex); return 'rgb(' + c.map(function (v, i) { return Math.round(v * 255 * .16 + [8, 8, 11][i] * .84); }).join(',') + ')'; }
     function pic(p, sz) {
       if (daCasa(p)) return '<img src="' + cut(p) + '" srcset="' + foto(p.id + '-640') + ' 640w, ' + cut(p) + ' 691w" sizes="' + SZ[sz || 'grande'] + '" alt="" loading="lazy" decoding="async" draggable="false">';
-      return '<img class="cut" style="--c:' + p.bg + '" src="' + cut(p) + '" srcset="' + foto(p.id + '-nicho-400') + ' 400w, ' + cut(p) + ' 820w" sizes="' + SZ[sz || 'grande'] + '" alt="" loading="lazy" decoding="async" draggable="false">';
+      return '<img class="cut" style="--c:' + p.bg + '" src="' + cut(p) + '" srcset="' + foto(p.id + '-frasco-400') + ' 400w, ' + cut(p) + ' 820w" sizes="' + SZ[sz || 'grande'] + '" alt="" loading="lazy" decoding="async" draggable="false">';
     }
     function btn(t, cls, attrs, tag) { return (tag === 'a' ? '<a ' : '<button type="submit" ') + 'class="btn ' + (cls || '') + '" data-m ' + (attrs || '') + '><span class="btn__t" data-t="' + t + '">' + t + '</span>' + (tag === 'a' ? '</a>' : '</button>'); }
     var byYear = P.slice().sort(function (a, b) { return a.year - b.year; });
@@ -1638,7 +1638,7 @@
     var GENS =['Todos', 'Feminino', 'Masculino', 'Unissex'], FAMS = [['todas', 'Todas as famílias'], ['floral', 'Floral'], ['madeira', 'Amadeirado'], ['ambar', 'Âmbar e especiarias']];
     $('#col').innerHTML = CASA.concat(P).map(function (p) {
       var rota = daCasa(p) ? '#casa-' + p.id : '#perfume-' + p.id, img = daCasa(p) ? '' : ' data-img';
-      return '<article class="itm" data-id="' + p.id + '" data-peek="' + (daCasa(p) ? foto(p.id + '-640') : foto(p.id + '-nicho-400')) + '"><a class="itm__im" href="' + rota + '" tabindex="-1" aria-hidden="true"' + img + '>' + pic(p, 'grade') + '</a>' +
+      return '<article class="itm" data-id="' + p.id + '" data-peek="' + (daCasa(p) ? foto(p.id + '-640') : foto(p.id + '-frasco-400')) + '"><a class="itm__im" href="' + rota + '" tabindex="-1" aria-hidden="true"' + img + '>' + pic(p, 'grade') + '</a>' +
         '<div class="itm__t"><a class="itm__n tall" href="' + rota + '">' + p.name + '</a><span class="itm__m">' + p.brand + ' · ' + p.fam + '</span><span class="itm__p">R$ ' + brl(p.p[0]) + '</span><button class="ln itm__a" type="button" data-add="' + p.id + '" aria-label="Adicionar ' + p.name + ' ' + p.s[0] + ' ml à sacola">Adicionar</button></div></article>';
     }).join('');
     function filterBtns() {
