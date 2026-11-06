@@ -306,6 +306,7 @@
   .pdp { position: relative; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: start; }
   .pdp__st { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: var(--pbg); }
   .pdp__st img { object-position: 50% 18%; }
+  .pdp__st.is-arriving #p-img { visibility: hidden !important; }
   .pdp__cap { position: absolute; left: var(--gut); bottom: 12px; z-index: 2; padding: 2px 8px; border-radius: 99px; background: rgba(0, 0, 0, .55); color: #fff; font-size: 12px; pointer-events: none; }
   .pdp__nm { position: absolute; z-index: 3; left: var(--gut); right: var(--gut); top: 74px; color: #fff; text-shadow: 0 2px 40px rgba(0, 0, 0, .25); pointer-events: none; font-size: 300px; white-space: nowrap; }
   .pdp__nav { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
@@ -2062,9 +2063,15 @@
           f.className = 'fly'; f.style.cssText += 'left:0;top:0;width:' + r0.width + 'px;height:' + r0.height + 'px;transform:translate(' + r0.left + 'px,' + r0.top + 'px);z-index:86';
           f.innerHTML = '<img src="' + (img.currentSrc || img.getAttribute('src')) + '" alt="" style="object-fit:contain">';
           document.body.appendChild(f); done = true; clearTimeout(safe);
+          $('#pdp-stage').classList.add('is-arriving');
           swap(q, true, false, true);
           var r1 = $('#pdp-stage').getBoundingClientRect();
-          G.to(f, { x: r1.left, y: r1.top, width: r1.width, height: r1.height, duration: 1.05, ease: 'expo.inOut', onComplete: function () { G.to(f, { opacity: 0, duration: .25, onComplete: function () { f.remove(); busy = false; } }); } });
+          var arrivingStyle = getComputedStyle($('#p-img'));
+          G.to(f.firstElementChild, { paddingTop: arrivingStyle.paddingTop, paddingRight: arrivingStyle.paddingRight, paddingBottom: arrivingStyle.paddingBottom, paddingLeft: arrivingStyle.paddingLeft, objectPosition: arrivingStyle.objectPosition, duration: 1.05, ease: 'expo.inOut' });
+          G.to(f, { x: r1.left, y: r1.top, width: r1.width, height: r1.height, duration: 1.05, ease: 'expo.inOut', onComplete: function () {
+            $('#pdp-stage').classList.remove('is-arriving');
+            f.remove(); busy = false;
+          } });
           return;
         }
         var col = q.pid ? escuro(byId(q.pid).bg) : '#0b0b0e';
