@@ -481,11 +481,14 @@
 
   @media (max-width: 1000px) { .col--grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (max-width: 860px) {
-    .sh__t { width: auto; height: 74svh; }
+    .sh__t { width: 500vw; height: calc(100vw * 768 / 340); aspect-ratio: auto; }
+    .sh__t .pw { left: calc(50vw - 100vw * 217 / 340); width: calc(100vw * 1792 / 340); max-width: none; }
+    .sh__t .sh__i { left: calc(var(--mobile-index) * 100vw) !important; width: 100vw !important; }
     .clo-im { bottom: auto; height: 50svh; object-position: 100% 50%; -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent); mask-image: linear-gradient(180deg, #000 82%, transparent); }
     .sh__i { scroll-snap-align: center; }
     .sh { overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; }
     .hero.is-close .sh { overflow: hidden; }
+    .hero.is-close .sh__t { clip-path: none; }
     .hero::after { background: linear-gradient(0deg, rgba(5, 5, 8, .97) 0, rgba(5, 5, 8, .9) 46%, transparent 62%); }
     .clo { left: var(--gut); right: var(--gut); top: auto; bottom: 14px; width: auto; gap: 9px; }
     .clo h2 { font-size: 40px; }
@@ -1411,7 +1414,7 @@
     var hero = $('#hero'), sh = $('#sh'), shT = $('#sh-t'), clo = $('#clo'), shOn = -1, closeI = -1;
     shT.innerHTML = '<img class="pw" src="' + foto('parede-render') + '" alt="Parede de pedra escura com cinco nichos iluminados, um frasco de perfume em cada" fetchpriority="high" draggable="false"><span class="pw-d"></span><img class="pw pw--g" src="' + foto('parede-render') + '" alt="" draggable="false">' + DESTAQUES.map(function (p, i) {
       var n = NICHOS[i];
-      return '<button class="sh__i" type="button" data-i="' + i + '" style="left:' + (n[0] / PW * 100) + '%;width:' + ((n[1] - n[0]) / PW * 100) + '%" aria-label="Ver de perto: ' + p.name + ', ' + p.brand + '">' +
+      return '<button class="sh__i" type="button" data-i="' + i + '" style="--mobile-index:' + i + ';left:' + (n[0] / PW * 100) + '%;width:' + ((n[1] - n[0]) / PW * 100) + '%" aria-label="Ver de perto: ' + p.name + ', ' + p.brand + '">' +
         '<span class="ni__c"><b>' + (p.short || p.name) + '</b><small>N°' + ('0' + (i + 1)).slice(-2) + ' · R$ ' + brl(p.p[sizeOf(p)]) + '</small></span></button>';
     }).join('');
     function shSet(i) {
