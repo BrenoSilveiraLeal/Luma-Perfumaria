@@ -78,7 +78,8 @@
   .top .top__p button { font-size: 12.5px; letter-spacing: .02em; }
   .top__b { display: grid; justify-items: start; }
   .top__b a { display: grid; justify-items: center; gap: 3px; font: 300 25px/1 var(--serif); letter-spacing: .44em; }
-  .top__b span { margin-right: -.44em; font: 400 8px/1 var(--sans); letter-spacing: .34em; white-space: nowrap; }
+  .top__name { margin-right: -.44em; }
+  .top__tag { margin-right: -.34em; font: 400 8px/1 var(--sans); letter-spacing: .34em; white-space: nowrap; }
   .top__r { display: inline-flex; align-items: center; gap: 7px; }
   .top__r svg { width: 25px; height: 25px; display: block; }
   .top__r b { display: grid; place-items: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 99px; background: var(--ht, #fff); color: var(--htb, #12100e); font-size: 11px; font-weight: 500; line-height: 1; font-variant-numeric: tabular-nums; }
@@ -711,7 +712,7 @@
 <script>/* Se algo falhar no carregamento, a tela de abertura não fica presa */ setTimeout(function () { var p = document.getElementById('pre'); if (p) p.remove(); }, 8000);</script>
 
 <header class="top band" id="top">
-  <div class="top__b"><a href="#inicio" aria-label="Luma Perfumaria, início">LUMA<span>PERFUMARIA</span></a></div>
+  <div class="top__b"><a href="#inicio" aria-label="Luma Perfumaria, início"><span class="top__name">LUMA</span><span class="top__tag">PERFUMARIA</span></a></div>
   <div class="top__p">
     <button class="top__l" type="button" id="menu-open" aria-haspopup="dialog">Menu</button>
     <i aria-hidden="true"></i>
